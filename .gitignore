@@ -3,6 +3,11 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# ignore data
+data/sample_submission.csv
+data/test.csv
+data/training.csv
+
 # C extensions
 *.so
 
