@@ -4,16 +4,11 @@ __pycache__/
 *$py.class
 
 
-# ignore data
-*sample_submission.csv
-*test.csv
-*training.csv
-*.csv
-*.xlsx
-*.xls
 
-# C extensions
-*.so
+# ignore data
+Análisis Exploratorio (EDA) WiDS 2024/data/sample_submission.csv
+data/test.csv
+data/training.csv
 
 # Distribution / packaging
 .Python
