@@ -6,7 +6,7 @@ __pycache__/
 
 
 # ignore data
-Análisis Exploratorio (EDA) WiDS 2024/data/sample_submission.csv
+data/sample_submission.csv
 data/test.csv
 data/training.csv
 
