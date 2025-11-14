@@ -3,12 +3,11 @@ __pycache__/
 *.py[codz]
 *$py.class
 
-Análisis Exploratorio (EDA) WiDS 2024/data/
-Análisis Exploratorio (EDA) WiDS 2024/data/*
-Análisis Exploratorio (EDA) WiDS 2024/data/*.csv
-
 
 # ignore data
+*sample_submission.csv
+*test.csv
+*training.csv
 *.csv
 *.xlsx
 *.xls
