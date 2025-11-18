@@ -5,8 +5,8 @@ Módulo encargado de:
 - Cargar los datos de WiDS Datathon 2024 desde la carpeta data/.
 - Separar la variable objetivo.
 - Detectar variables numéricas y categóricas.
-- Construir un preprocesador (scaler + OneHotEncoder).
-- Generar splits de entrenamiento y validación listos para usar con modelos de sklearn.
+- Construir un preprocesador (imputación + escalado + OneHotEncoder).
+- Generar splits de entrenamiento y validación listos para usar.
 """
 
 import os
@@ -17,6 +17,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 
 
 class WiDSDataModule:
@@ -26,15 +27,15 @@ class WiDSDataModule:
 
     def __init__(
         self,
-        data_dir: str = r"C:\Users\INIFAP-MOVIL\Documents\3 TERCER SEMESTRE\Topicos II\Trabajos\Topicos_II\Topicos_II\Pipeline de Machine Learning\data",
+        data_dir: str = "data",          # carpeta donde están los CSV (ruta relativa)
         train_filename: str = "training.csv",
         test_filename: str = "test.csv",
-        target_col: str = "DiagPeriodL90D",  # 👈 Ajusta si tu columna objetivo tiene otro nombre
-        scaler_type: str = "standard",       # "standard" (StandardScaler) o "minmax" (MinMaxScaler)
+        target_col: str = "DiagPeriodL90D",  # AJUSTA si tu target se llama diferente
+        scaler_type: str = "standard",       # "standard" o "minmax"
         test_size: float = 0.2,
         random_state: int = 42,
     ):
-        # Ruta base donde está tu carpeta data
+        # Rutas completas a los archivos
         self.data_dir = data_dir
         self.train_path = os.path.join(self.data_dir, train_filename)
         self.test_path = os.path.join(self.data_dir, test_filename)
@@ -44,59 +45,59 @@ class WiDSDataModule:
         self.test_size = test_size
         self.random_state = random_state
 
-        # Estos atributos se llenan al llamar a load_data() y prepare_data()
+        # Estos se rellenan después
         self.df_train = None
         self.df_test = None
         self.X_train = None
         self.X_val = None
         self.y_train = None
         self.y_val = None
-        self.preprocessor = None  # ColumnTransformer
+        self.preprocessor = None
 
     # ---------------------------------------------------------
     # 1) Carga de datos
     # ---------------------------------------------------------
     def load_data(self):
-        """Carga los CSV de training y test desde la carpeta data/ especificada."""
+        """Carga training.csv y test.csv desde la carpeta data/."""
         if not os.path.exists(self.train_path):
             raise FileNotFoundError(f"No se encontró el archivo de entrenamiento: {self.train_path}")
         if not os.path.exists(self.test_path):
             raise FileNotFoundError(f"No se encontró el archivo de test: {self.test_path}")
 
-        print("📂 Cargando datos...")
+        print("Cargando datos...")
         print(f" - training: {self.train_path}")
         print(f" - test    : {self.test_path}")
 
         self.df_train = pd.read_csv(self.train_path)
         self.df_test = pd.read_csv(self.test_path)
 
-        # Aseguramos que el target existe en df_train
         if self.target_col not in self.df_train.columns:
             raise ValueError(
                 f"La columna objetivo '{self.target_col}' no existe en df_train.\n"
                 f"Columnas disponibles: {self.df_train.columns.tolist()}"
             )
 
-        print("✅ Datos cargados correctamente.")
+        print("Datos cargados correctamente.")
         print(f" - df_train: {self.df_train.shape[0]} filas, {self.df_train.shape[1]} columnas")
         print(f" - df_test : {self.df_test.shape[0]} filas, {self.df_test.shape[1]} columnas")
 
     # ---------------------------------------------------------
-    # 2) Construcción del preprocesador (numéricas + categóricas)
+    # 2) Preprocesador (imputación + escalado + one-hot)
     # ---------------------------------------------------------
     def _build_preprocessor(self, X: pd.DataFrame):
         """
-        Construye un ColumnTransformer que:
-        - Escala las variables numéricas (StandardScaler o MinMaxScaler).
-        - Aplica OneHotEncoder a las categóricas con handle_unknown='ignore'.
+        Construye el ColumnTransformer:
+        - Imputación de NaN en numéricas y categóricas.
+        - Escalado en numéricas.
+        - OneHotEncoder en categóricas.
         """
         num_cols = X.select_dtypes(include=[np.number]).columns.tolist()
         cat_cols = X.select_dtypes(include=["object", "category"]).columns.tolist()
 
-        print(f"📊 Columnas numéricas: {len(num_cols)}")
-        print(f"🔡 Columnas categóricas: {len(cat_cols)}")
+        print(f"Columnas numéricas: {len(num_cols)}")
+        print(f"Columnas categóricas: {len(cat_cols)}")
 
-        # Elegir el tipo de scaler
+        # Elegimos tipo de scaler
         if self.scaler_type == "standard":
             scaler = StandardScaler()
         elif self.scaler_type == "minmax":
@@ -104,12 +105,16 @@ class WiDSDataModule:
         else:
             raise ValueError("scaler_type debe ser 'standard' o 'minmax'.")
 
+        # Numéricas: imputar mediana + escalar
         numeric_transformer = Pipeline(steps=[
-            ("scaler", scaler)
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", scaler),
         ])
 
+        # Categóricas: imputar valor más frecuente + one-hot
         categorical_transformer = Pipeline(steps=[
-            ("onehot", OneHotEncoder(handle_unknown="ignore"))
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("onehot", OneHotEncoder(handle_unknown="ignore")),
         ])
 
         preprocessor = ColumnTransformer(
@@ -122,44 +127,41 @@ class WiDSDataModule:
         return preprocessor
 
     # ---------------------------------------------------------
-    # 3) Preparar datos: separar target, hacer split train/val
+    # 3) Preparar datos (split train/val + preprocesador)
     # ---------------------------------------------------------
     def prepare_data(self):
         """
-        Separa la variable objetivo, construye preprocesador y realiza split train/validation.
+        Separa X/y, hace el train/validation split y construye el preprocesador.
         """
         if self.df_train is None:
             raise ValueError("Primero debes llamar a load_data().")
 
-        # Separamos X (features) e y (target)
+        # Separar features y target
         X = self.df_train.drop(columns=[self.target_col])
         y = self.df_train[self.target_col]
 
-        # Split train/validación estratificado por la variable objetivo
+        # Split estratificado
         self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(
             X,
             y,
             test_size=self.test_size,
             random_state=self.random_state,
-            stratify=y
+            stratify=y,
         )
 
         print(f"✂️ Split realizado: {self.X_train.shape[0]} train / {self.X_val.shape[0]} val")
 
-        # Construimos preprocesador en base a X_train
+        # Construir preprocesador con las columnas de X_train
         self.preprocessor = self._build_preprocessor(self.X_train)
-        print("✅ Preprocesador construido.")
+        print("Preprocesador construido.")
 
     # ---------------------------------------------------------
-    # 4) Accesor para obtener todo listo para modelos
+    # 4) Devolver todo listo para modelos
     # ---------------------------------------------------------
     def get_splits_and_preprocessor(self):
         """
-        Devuelve los splits y el preprocesador listos para usar en ML:
-        X_train, X_val, y_train, y_val, preprocessor
+        Devuelve X_train, X_val, y_train, y_val y el preprocesador.
         """
         if any(v is None for v in [self.X_train, self.X_val, self.y_train, self.y_val, self.preprocessor]):
             raise ValueError("Debes llamar a prepare_data() antes de obtener los splits.")
         return self.X_train, self.X_val, self.y_train, self.y_val, self.preprocessor
-
-
