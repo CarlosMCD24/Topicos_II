@@ -1,3 +1,5 @@
+
+# Se exportan los módulos necesarios y se definen las funciones principales
 from module_data import WiDSDataModule
 from module_ml import WiDSModelRunner
 import pandas as pd
@@ -11,16 +13,16 @@ def main():
         target_col="DiagPeriodL90D", # Columna objetivo
         scaler_type="standard" # "standard" o "minmax"
     )
-    # Cargar y preparar datos
-    data_module.load_data() # Cargar datos desde archivos CSV
-    data_module.prepare_data() # Preprocesar y dividir datos
+    # Se Cargan y preparan los datos
+    data_module.load_data()
+    data_module.prepare_data() 
     X_train, X_val, y_train, y_val, preprocessor = data_module.get_splits_and_preprocessor() # Obtener divisiones y preprocesador
 
-    # Ejecutar experimentos de modelos
-    model_runner = WiDSModelRunner() # Instanciar el corredor de modelos
+    # Se ejecutan los experimentos de modelos
+    model_runner = WiDSModelRunner() 
     results = model_runner.run_experiments( 
         preprocessor, X_train, y_train, X_val, y_val
-    ) # Ejecutar experimentos de modelos
+    ) 
 
     print("\nRESUMEN FINAL")
     print(pd.DataFrame(results).T)

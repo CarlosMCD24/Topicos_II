@@ -1,12 +1,10 @@
 """
-module_ml.py
-------------
 Módulo encargado de:
 - Definir y entrenar varios modelos de clasificación.
 - Evaluar cada modelo con diferentes métricas.
 - Integrar MLflow para registrar experimentos, métricas y parámetros.
 """
-
+# Librerías necesarias para manejo de modelos, métricas y MLflow
 import time
 from typing import Dict, Any
 
@@ -22,21 +20,17 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 
-
+# Clase para manejar la experimentación de múltiples modelos sobre los datos preprocesados
 class WiDSModelRunner:
-    """
-    Clase para manejar la experimentación de múltiples modelos sobre los datos preprocesados.
-    """
     
     def __init__(self, experiment_name: str = "WiDS_2024_Experiments"): # Inicializador
+        
         # Configuramos MLflow para que use la carpeta mlruns local
-        mlflow.set_tracking_uri("mlruns") # Carpeta local
-        mlflow.set_experiment(experiment_name) # Nombre del experimento
-        self.experiment_name = experiment_name # Nombre del experimento
+        mlflow.set_tracking_uri("mlruns")  
+        mlflow.set_experiment(experiment_name) 
+        self.experiment_name = experiment_name 
 
-    # ---------------------------------------------------------
-    # 1) Definir modelos a experimentar
-    # ---------------------------------------------------------
+        # 1. Definir los modelos a experimentar
     def get_models(self) -> Dict[str, Any]: # Devuelve diccionario de modelos
         """
         Devuelve un diccionario de modelos a evaluar.
@@ -72,9 +66,7 @@ class WiDSModelRunner:
         }
         return models # Diccionario de modelos
 
-    # ---------------------------------------------------------
-    # 2) Entrenar y evaluar un modelo individual con MLflow
-    # ---------------------------------------------------------
+    # 2. Entrenar y evaluar un modelo individual con MLflow
     def train_and_evaluate_model( # Función para entrenar y evaluar un modelo
         self, # Referencia a la instancia
         model_name: str, # Nombre del modelo
