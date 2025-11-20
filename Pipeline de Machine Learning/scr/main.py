@@ -8,10 +8,10 @@ import pandas as pd
 def main(): 
     data_module = WiDSDataModule(
         data_dir=r"C:\\Users\\INIFAP-MOVIL\\Documents\\3 TERCER SEMESTRE\\Topicos II\\Trabajos\\Topicos_II\\Topicos_II\\Pipeline de Machine Learning\\data",
-        train_filename="training.csv", # Nombres de archivos
-        test_filename="test.csv", # Nombres de archivos
-        target_col="DiagPeriodL90D", # Columna objetivo
-        scaler_type="standard" # "standard" o "minmax"
+        train_filename="training.csv", 
+        test_filename="test.csv", 
+        target_col="DiagPeriodL90D", 
+        scaler_type="standard" 
     )
     # Se Cargan y preparan los datos
     data_module.load_data()

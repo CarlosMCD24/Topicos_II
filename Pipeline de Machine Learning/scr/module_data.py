@@ -1,11 +1,10 @@
-"""Módulo encargado de:
+# Módulo encargado de:
+    # Cargar los datos de WiDS Datathon 2024 desde la carpeta data/.
+    # Separar la variable objetivo.
+    # Detectar variables numéricas y categóricas.
+    # Construir un preprocesador (imputación + escalado + OneHotEncoder).
+    # Generar splits de entrenamiento.
 
-- Cargar los datos de WiDS Datathon 2024 desde la carpeta data/.
-- Separar la variable objetivo.
-- Detectar variables numéricas y categóricas.
-- Construir un preprocesador (imputación + escalado + OneHotEncoder).
-- Generar splits de entrenamiento.
-"""
 # Librerías necesarias para manejo de datos y preprocesamiento
 import os
 import numpy as np
@@ -23,9 +22,9 @@ class WiDSDataModule:
     def __init__(
         self,
         data_dir: str = "data", # Directorio donde están los datos
-        train_filename: str = "training.csv", # Nombre del archivo de entrenamiento
-        test_filename: str = "test.csv", # Nombre del archivo de test
-        target_col: str = "DiagPeriodL90D",  # AJUSTA si tu target se llama diferente
+        train_filename: str = "training.csv", 
+        test_filename: str = "test.csv", 
+        target_col: str = "DiagPeriodL90D", 
         scaler_type: str = "standard", # "standard" o "minmax"
         test_size: float = 0.2,
         random_state: int = 42,
@@ -118,14 +117,14 @@ class WiDSDataModule:
 
         return preprocessor
 
-    # 3) Preparar datos (split train/val + preprocesador)
+    # 3) Preparamos los datos (split train/val + preprocesador)
     def prepare_data(self):
         
         # Separa X/y, hace el train/validation split y construye el preprocesador.
         if self.df_train is None:
-            raise ValueError("Primero debes llamar a load_data().")
+            raise ValueError("Primero se debe llamar a load_data().")
 
-        # Separar features y target
+        # Separamos features y target
         X = self.df_train.drop(columns=[self.target_col])
         y = self.df_train[self.target_col]
 
@@ -140,12 +139,12 @@ class WiDSDataModule:
 
         print(f"Split realizado: {self.X_train.shape[0]} train / {self.X_val.shape[0]} val")
 
-        # Construir preprocesador con las columnas de X_train
+        # Construimos el preprocesador con las columnas de X_train
         self.preprocessor = self._build_preprocessor(self.X_train)
         print("Preprocesador construido.")
 
     
-    # 4) Devuelve todo listo para los modelos
+    # 4) Nos devuelve todo listo para los modelos
     def get_splits_and_preprocessor(self):
         
         # Devuelve X_train, X_val, y_train, y_val y el preprocesador.
