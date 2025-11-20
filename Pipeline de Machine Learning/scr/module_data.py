@@ -21,11 +21,11 @@ class WiDSDataModule:
     # Inicialización con parámetros de configuración
     def __init__(
         self,
-        data_dir: str = "data", # Directorio donde están los datos
+        data_dir: str = "data", 
         train_filename: str = "training.csv", 
         test_filename: str = "test.csv", 
         target_col: str = "DiagPeriodL90D", 
-        scaler_type: str = "standard", # "standard" o "minmax"
+        scaler_type: str = "standard", 
         test_size: float = 0.2,
         random_state: int = 42,
     ):
