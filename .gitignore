@@ -12,6 +12,10 @@ data/training.csv
 *.xlsx
 *.xls
 
+# No subir las imágenes de entrenamiento y prueba
+data/train/
+data/test/
+
 # Distribution / packaging
 .Python
 build/
