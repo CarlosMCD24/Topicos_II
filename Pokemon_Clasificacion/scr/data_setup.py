@@ -1,82 +1,76 @@
-"""
-Contains functionality for creating PyTorch DataLoaders for 
-image classification data.
-"""
-import os
 
+"""
+data_setup.py
+
+Funcionalidad para crear DataLoaders de PyTorch con aumentos de datos
+para el problema de clasificación de imágenes de Pokémon.
+"""
+
+import os
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
 NUM_WORKERS = os.cpu_count()
 
 def create_dataloaders(
-    train_dir: str, 
-    test_dir: str, 
-    transform: transforms.Compose, 
-    batch_size: int, 
-    num_workers: int=NUM_WORKERS
+    train_dir: str,
+    test_dir: str,
+    image_size: int,
+    batch_size: int,
+    num_workers: int = NUM_WORKERS,
 ):
-  """Creates training and testing DataLoaders.
+    """Crea DataLoaders de entrenamiento y prueba con aumentos de datos."""
 
-  Takes in a training directory and testing directory path and turns
-  them into PyTorch Datasets and then into PyTorch DataLoaders.
+    # Transformaciones para ENTRENAMIENTO (con aumentos de datos)
+    train_transform = transforms.Compose([
+        transforms.RandomResizedCrop(size=image_size, scale=(0.8, 1.0)),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomRotation(degrees=25),
+        transforms.ColorJitter(
+            brightness=0.2,
+            contrast=0.2,
+            saturation=0.2,
+            hue=0.05
+        ),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=(0.5, 0.5, 0.5),
+            std=(0.5, 0.5, 0.5)
+        ),
+    ])
 
-  Args:
-    train_dir: Path to training directory.
-    test_dir: Path to testing directory.
-    transform: torchvision transforms to perform on training and testing data.
-    batch_size: Number of samples per batch in each of the DataLoaders.
-    num_workers: An integer for number of workers per DataLoader.
+    # Transformaciones para TEST (sin aumentos, solo preparación)
+    test_transform = transforms.Compose([
+        transforms.Resize((image_size, image_size)),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=(0.5, 0.5, 0.5),
+            std=(0.5, 0.5, 0.5)
+        ),
+    ])
 
-  Returns:
-    A tuple of (train_dataloader, test_dataloader, class_names).
-    Where class_names is a list of the target classes.
-    Example usage:
-      train_dataloader, test_dataloader, class_names = \
-        = create_dataloaders(train_dir=path/to/train_dir,
-                             test_dir=path/to/test_dir,
-                             transform=some_transform,
-                             batch_size=32,
-                             num_workers=4)
-  """
-  # Use ImageFolder to create dataset(s)
-  train_data = datasets.ImageFolder(train_dir, transform=transform)
-  test_data = datasets.ImageFolder(test_dir, transform=transform)
+    # Datasets
+    train_data = datasets.ImageFolder(train_dir, transform=train_transform)
+    test_data = datasets.ImageFolder(test_dir, transform=test_transform)
 
-  # Get class names
-  class_names = train_data.classes
+    # Clases
+    class_names = train_data.classes
 
-  # Turn images into data loaders
-  train_dataloader = DataLoader(
-      train_data,
-      batch_size=batch_size,
-      shuffle=True,
-      num_workers=num_workers,
-      pin_memory=True,
-  )
-  test_dataloader = DataLoader(
-      test_data,
-      batch_size=batch_size,
-      shuffle=False, # don't need to shuffle test data
-      num_workers=num_workers,
-      pin_memory=True,
-  )
+    # DataLoaders
+    train_dataloader = DataLoader(
+        train_data,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=True,
+    )
 
-  return train_dataloader, test_dataloader, class_names
+    test_dataloader = DataLoader(
+        test_data,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=True,
+    )
 
-if __name__ == '__main__':
-# #   train_tfms = transforms.Compose([transforms.Resize((400, 400)),
-# #                                    transforms.RandomHorizontalFlip(),
-# #                                    transforms.RandomRotation(15),
-# #                                    transforms.ToTensor(),
-# #                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
-#  tr, ts, classes = create_dataloaders(
-#    train_dir =r"C:/Users/INIFAP-MOVIL/Documents/3 TERCER SEMESTRE/Topicos II/Trabajos/Topicos_II/Topicos_II/Pokemon_Clasificacion/data/train",
-#     test_dir =r"C:/Users/INIFAP-MOVIL/Documents/3 TERCER SEMESTRE/Topicos II/Trabajos/Topicos_II/Topicos_II/Pokemon_Clasificacion/data/test", 
-#     transform= transforms.Compose, 
-#     batch_size= 8, 
-#     num_workers=2
-# )
-#  print(classes)
-  
+    return train_dataloader, test_dataloader, class_names
