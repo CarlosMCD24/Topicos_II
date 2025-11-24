@@ -1,17 +1,21 @@
 
 """
-data_setup.py
+Este módulo contiene las funciones necesarias para preparar los datos
+de imágenes y convertirlos en DataLoaders utilizables por PyTorch para
+entrenar y evaluar modelos de Deep Learning.
 
-Funcionalidad para crear DataLoaders de PyTorch con aumentos de datos
-para el problema de clasificación de imágenes de Pokémon.
+Su propósito es automatizar la carga de las imágenes, aplicar
+transformaciones (data augmentation y normalización) y generar lotes
+(batch) de datos para entrenamiento y prueba.
 """
-
+# Importaciones necesarias de librerías
 import os
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
 NUM_WORKERS = os.cpu_count()
 
+# Definición de la función para crear DataLoaders
 def create_dataloaders(
     train_dir: str,
     test_dir: str,
@@ -49,7 +53,7 @@ def create_dataloaders(
         ),
     ])
 
-    # Datasets
+    # Datasets de entrenamiento y test
     train_data = datasets.ImageFolder(train_dir, transform=train_transform)
     test_data = datasets.ImageFolder(test_dir, transform=test_transform)
 

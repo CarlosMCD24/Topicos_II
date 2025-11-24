@@ -1,20 +1,20 @@
 
 """
-model_builder.py
-
-Define dos arquitecturas de CNN:
-- TinyVGG  (modelo base)
-- TinyVGG_2 (modelo mejorado)
+Este módulo contiene las clases de arquitecturas de redes neuronales
+convolucionales (CNN) utilizadas en el proyecto. Su objetivo es definir
+de forma clara, modular y reutilizable los modelos TinyVGG y TinyVGG_2
+para tareas de clasificación de imágenes con PyTorch.
 """
 
 import torch
 from torch import nn
 
+# Definición de la clase del modelo TinyVGG
 class TinyVGG(nn.Module):
-    """Modelo base estilo TinyVGG (2 bloques convolucionales)."""
+    # Modelo base estilo TinyVGG (2 bloques convolucionales)
     def __init__(self, input_shape: int, hidden_units: int, output_shape: int):
         super().__init__()
-
+        
         self.conv_block_1 = nn.Sequential(
             nn.Conv2d(in_channels=input_shape,
                       out_channels=hidden_units,
@@ -60,10 +60,9 @@ class TinyVGG(nn.Module):
         x = self.classifier(x)
         return x
 
-
+# Definición de la clase del modelo TinyVGG_2
 class TinyVGG_2(nn.Module):
-    """TinyVGG_2 — Versión mejorada del modelo TinyVGG."""
-    def __init__(self, input_shape: int, hidden_units: int, output_shape: int, dropout_p: float = 0.4):
+       def __init__(self, input_shape: int, hidden_units: int, output_shape: int, dropout_p: float = 0.4):
         super().__init__()
 
         # Bloque 1
@@ -101,7 +100,7 @@ class TinyVGG_2(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(2)
         )
-
+        # Clasificador
         self.classifier = nn.Sequential(
             nn.Flatten(),
             nn.Dropout(dropout_p),
@@ -112,7 +111,7 @@ class TinyVGG_2(nn.Module):
             nn.ReLU(),
             nn.Linear(256, output_shape)
         )
-
+    # Método forward
     def forward(self, x):
         x = self.block1(x)
         x = self.block2(x)

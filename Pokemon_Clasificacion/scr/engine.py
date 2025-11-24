@@ -1,11 +1,17 @@
 
-"""Funciones de entrenamiento y evaluación (engine.py)."""
+"""Funciones de entrenamiento y evaluación.
+
+Este módulo contiene las funciones necesarias para ejecutar el ciclo
+de entrenamiento y evaluación de una red neuronal en PyTorch. Su
+objetivo es gestionar de manera organizada y reutilizable el proceso 
+de forward pass, cálculo de pérdida, backpropagation, actualización 
+de parámetros y medición de métricas."""
 
 from typing import Dict, List
 import torch
 from torch import nn
 
-
+# Definición de la función de entrenamiento por época
 def train_step(model, dataloader, loss_fn, optimizer, device):
     model.train()
     train_loss, train_acc = 0.0, 0.0
@@ -39,7 +45,7 @@ def test_step(model, dataloader, loss_fn, device):
     test_acc /= len(dataloader)
     return test_loss, test_acc
 
-
+# Definición de la función de entrenamiento completa
 def train(
     model: torch.nn.Module,
     train_dataloader,

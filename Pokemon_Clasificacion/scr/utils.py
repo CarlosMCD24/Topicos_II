@@ -1,5 +1,10 @@
 
-"""utils.py: guardar modelos y graficar curvas."""
+"""Este módulo reúne funciones auxiliares que apoyan el flujo completo del
+experimento de entrenamiento de redes neuronales convolucionales. Su
+propósito es centralizar tareas de apoyo como almacenamiento de modelos
+y generación de gráficas de desempeño, manteniendo el código organizado
+y evitando duplicación en el notebook y otros módulos.
+Funciones: """
 
 import torch
 from pathlib import Path

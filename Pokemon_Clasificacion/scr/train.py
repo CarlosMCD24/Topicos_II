@@ -42,7 +42,7 @@ def train_experiment(
     utils.plot_loss_curves(results, save_dir=str(save_dir))
     print(
         f"[RESULTADOS] {model_name} -> "
-        f"Train Acc: {results['train_acc'][-1]:.4f} | Test Acc: {results['test_acc'][-1]:.4f}"
+        f"Train Acc: {results['train_acc'][-1]:.2f} | Test Acc: {results['test_acc'][-1]:.2f}"
     )
     return results
 
@@ -54,8 +54,12 @@ def main():
     LEARNING_RATE = 1e-3
     IMAGE_SIZE = 64
 
-    train_dir = "../data/train"
-    test_dir = "../data/test"
+    train_dir = r"C:/Users/INIFAP-MOVIL/Documents/3 TERCER SEMESTRE/Topicos II/Trabajos/Topicos_II/Topicos_II/Pokemon_Clasificacion/data/train"
+    test_dir  = r"C:/Users/INIFAP-MOVIL/Documents/3 TERCER SEMESTRE/Topicos II/Trabajos/Topicos_II/Topicos_II/Pokemon_Clasificacion/data/test"
+
+    
+    #train_dir = "data/train"
+    #test_dir = "data/test"
 
     device = get_device()
 
