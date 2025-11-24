@@ -1,5 +1,17 @@
 
-"""train.py: entrena TinyVGG y TinyVGG_2."""
+"""Este script sirve como punto de ejecución para entrenar y evaluar
+los modelos de clasificación de Pokémon utilizando la arquitectura
+TinyVGG (modelo base) y TinyVGG_2 (modelo mejorado). El entrenamiento
+incluye la carga de datos, creación de modelos, ciclo de entrenamiento
+y almacenamiento de resultados.
+
+Este archivo no contiene la lógica interna del entrenamiento; en su
+lugar, actúa como un coordinador que utiliza las funciones y clases
+definidas en los módulos:
+    data_setup.py------carga de imágenes y DataLoaders
+    model_builder.py---definición de arquitecturas CNN
+    engine.py----------ciclo de entrenamiento y evaluación
+    utils.py-----------guardado de modelos y gráficas."""
 
 from pathlib import Path
 import torch
